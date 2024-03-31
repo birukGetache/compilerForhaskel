@@ -1,0 +1,218 @@
+
+
+class_declaration : CLASS IDENTIFIER type_specifier WHERE class_body
+                  ; 
+class_body : function_decl
+           | function_definition
+           | class_body function_decl
+           | class_body function_definition
+           ;
+
+function_decl : IDENTIFIER '::' type_specifier '->' type_specifier '->' ... '->' type_specifier
+                 | IDENTIFIER '::' type_specifier '->' type_specifier '->' ... '->' type_specifier
+                 ;
+function_definition: function_decl func_body
+
+
+class_body : statement_list 
+           | statement_list function_decl
+           | function_decl statement_list
+           ;   
+parm : type_specifier IDENTIFIER
+     | 
+     ;
+func_body : statement_list
+          |
+          ;
+assignment : IDENTIFIER ASSIGN expression {  char *identifier = $1;
+                                         // Check if the identifier exists in the symbol table
+                                        int token = search_symbol_table(identifier);
+                                       if (token != -1) {
+                                          // Identifier exists, perform the assignment
+                                       printf("Assignment to identifier '%s' is allowed.\n", identifier);
+                                            }
+                                             else {
+                                              // Identifier does not exist, print an error message
+                                         printf("Error: Identifier '%s' not declared.\n", identifier);
+                                         yyerror("Assignment not allowed");
+                                            // You can also choose to exit parsing or handle the error differently
+                                           } }
+           ;
+
+system_out_println : SYSTEM DOT OUT DOT PRINTLN LPAREN expression RPAREN
+                   | SYSTEM DOT OUT DOT PRINTLN LPAREN STRING_CONST RPAREN
+                   | SYSTEM DOT OUT DOT PRINTLN LPAREN  RPAREN
+                   ;
+increament_decreament : IDENTIFIER PLUS PLUS 
+                      | IDENTIFIER MINUS MINUS            
+                      ;
+out_put_statment : PUTSTRLN  STRING_CONST
+                 | PUTSTRLN  STRING_CONST  
+                 | PUTSTRLN  LEFTPAREN function_call RIGHTPAREN
+                 | PUTSTRLN  LEFTPAREN function_call RIGHTPAREN
+                 |PUTSTRLN   LEFTPAREN STRING_CONST PLUS PLUS function_call RIGHTPARENPAREN 
+                 | PUTSTRLN  LEFTPAREN function_call PLUS PLUS STRING_CONST RIGHTPAREN 
+                 ;
+declaration : type_specifier var_declarations   
+            ;
+
+var_declarations : var_declaration
+                 | var_declarations COMMA var_declaration
+                 ;
+
+var_declaration :  IDENTIFIER
+                |  IDENTIFIER ASSIGN expression
+                ;
+
+type_specifier : INT
+               | FLOAT
+               | STRING
+               ;
+type_annotation:  LEFTPAREN INT_CONST '::'INT RIGHTPAREN
+               |  LEFTPAREN FLOAT_CONST '::' FLOAT RIGHTPAREN
+               |   LEFTPAREN STRING_CONST '::' STRING RIGHTPAREN
+               ;
+selection_statement : IF LPAREN expression RPAREN statement
+                    | IF LPAREN expression RPAREN statement ELSE statement
+                    | IF LPAREN expression RPAREN LBRACE statement RBRACE ELSE statement
+                    | IF LPAREN expression RPAREN LBRACE statement RBRACE LBRACE statement RBRACE
+                    | SWITCH LPAREN expression RPAREN statement
+                    | IF LPAREN expression RPAREN LBRACE statement RBRACE
+                    ;
+
+iteration_statement : WHILE LPAREN expression RPAREN LBRACE iteration_statement_body RBRACE
+                    | DO LBRACE iteration_statement_body RBRACE WHILE LPAREN expression RPAREN SEMICOLON 
+                    | FOR LPAREN declaration SEMICOLON expression SEMICOLON expression RPAREN LBRACE iteration_statement_body RBRACE
+                    | FOR LPAREN  SEMICOLON SEMICOLON SEMICOLON RPAREN RPAREN LBRACE iteration_statement_body RBRACE
+                    | FOR LPAREN declaration SEMICOLON SEMICOLON RPAREN RPAREN LBRACE iteration_statement_body RBRACE
+                    ;
+             
+iteration_statement_body : statement_list
+                         ;
+
+expression_list : /* empty */
+                | expression_list expression SEMICOLON
+                ;
+expression : conditional_expression
+           | let_expression
+           | lambda_expression
+           | case_expression
+           | infix_expression
+           | prefix_expression
+           | primary_expression
+           ;
+conditional_expression : IF expression THEN expression ELSE expression
+let_expression : LET declaration_list IN expression
+declaration_list : 
+                 | declaration_list declaration SEMICOLON
+                 ;
+declaration : IDENTIFIER ASSIGN expression
+function_call : show LEFTPAREN expression RIGHTPAREN
+               |show IDENTIFIER 
+                ;
+case_expression : CASE expression OF case_alternatives
+case_alternatives : case_alternative
+                   | case_alternatives SEMICOLON case_alternative
+                   ;
+case_alternative : pattern ARROW expression
+pattern : IDENTIFIER
+        | constant
+        | tuple_pattern
+        ;
+constant : INTEGER
+         | FLOAT
+         | CHAR
+         | STRING
+         | BOOL
+         ;
+tuple_pattern : LPAREN pattern_list RPAREN
+pattern_list : 
+             | pattern_list COMMA pattern
+             ;
+infix_expression : expression PLUS expression
+                 | expression MINUS expression
+                 | expression MULTIPLY expression
+                 | expression DIVIDE expression
+                 | expression EQUALS expression
+                 | expression NOT_EQUALS expression
+                 | expression LESS_THAN expression
+                 | expression LESS_THAN_EQUAL expression
+                 | expression GREATER_THAN expression
+                 | expression GREATER_THAN_EQUAL expression
+                 | expression AND expression
+                 | expression OR expression
+                 ;
+prefix_expression : MINUS expression %prec NOT
+                   | NOT expression
+                   ;
+
+primary_expression : constant
+                   | IDENTIFIER
+                   | LPAREN expression RPAREN
+                   | LBRACKET expression_list RBRACKET
+                   | LBRACE expression_list RBRACE
+                   ;
+statement : type_specifier expression SEMICOLON
+          | declaration SEMICOLON
+          | assignment SEMICOLON
+          | selection_statement
+          | iteration_statement
+          | jump_statement
+          | out_put_statment
+          | increament_decreament SEMICOLON
+          | system_out_println SEMICOLON
+          | print_statement SEMICOLON  // Add a rule for the print statement
+          ;
+
+print_statement : PRINT LPAREN expression RPAREN
+               {
+                   add_to_symbol_table("print", PRINT);  // Add the print statement to the symbol table
+               }
+               ;
+
+primary_expression : IDENTIFIER
+                    | FLOAT_CONST
+                    | INT_CONST
+                    | STRING_CONST
+                    | CHAR_CONST
+                    ;
+
+%%
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+expression : IDENTIFIER
+           | INT_CONST
+           | FLOAT_CONST
+           | STRING_CONST
+           | expression PLUS expression
+           | expression MINUS expression
+           | expression MULTIPLY expression
+           | expression DIVIDE expression
+           | expression MODULO expression
+           | LEFTPAREN expression RIGHTPAREN
+           ;

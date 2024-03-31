@@ -1,392 +1,84 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
-#include <stddef.h>
-void yyerror(const char *s);
+#include <string.h>
+
+extern int yylineno;
+extern void displaySymbolTable();
 extern FILE *yyin;
-int yyparse(void);
+extern int yylex();
 
-#define YY_DECL int yylex(void)
+int yyerror(char *s);
 
-#define YY_FATAL_ERROR(msg) fprintf(stderr, "%s\n", msg)
+typedef struct {
+    char* strval;
+    float floatval;
+    int intval;
+    char charval;
+} YYSTYPE;
 
-#define YY_INPUT(buf, result, max_size) \
-    result = fread(buf, 1, max_size, yyin)
-
-#define YY_NULL 0
-
-#define YY_FATAL_ERROR(msg) fprintf(stderr, "%s\n", msg)
-
-#define YY_USER_ACTION
-
-#define YY_BREAK return 0
-
-#define YY_USER_INIT
-
-#define YY_USER_ACTION
-
-#define YY_REJECT
-
-#define YY_MORE_ADJ 0
-
-#define YY_RESTORE_LEX
-
-#define YY_RESTORE_YY_MORE_OFFSET
-
-#define YY_USER_INIT
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
-
-#define YY_USER_ACTION
+#define YYSTYPE_IS_DECLARED
 %}
 
-%token IF THEN ELSE LET IN CASE OF WHERE DO
-%token INTEGER IDENTIFIER
-%token PLUS MINUS MULTIPLY DIVIDE
-%token EQUALS NOT_EQUALS LESS_THAN LESS_THAN_OR_EQUAL GREATER_THAN GREATER_THAN_OR_EQUAL
-%token AND OR NOT
-%token LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET SEMICOLON COMMA COLON TYPE_SEPARATOR
-%token ASSIGN ARROW PIPE WILDCARD
-%token COMMENT
-%token UNKNOWN
+%union {
+    char* strval;
+    float floatval;
+    int intval;
+    char charval;
+    char* expression;
+}
+
+%token <strval> identifier STRING_CONST
+%token <floatval> FLOAT_CONST
+%token <intval> INT_CONST
+%token <charval> CHAR_CONST
+
+%token PUTSTRLN IMPORT BREAK STRING_LITERAL DO IF ELSE SEMICOLON COMMA ASSIGN MINUS PLUS MULTIPLY DIVIDE MODULO DOT RIGHTBRACKET LEFTBRACKET IO CASE OF MAIN LEFTBRACE RIGHTBRACE 
+%token LESS_THAN LESS_EQUAL GREATER_THAN GREATER_EQUAL EQUALS NOT_EQUALS AND OR NOT BOOL CHAR INT FLOAT VOID STRING LET ARROW CLASS WHERE DOUBLE_COLON LEFTPAREN RIGHTPAREN INSTANCE
 
 %%
 
-program:
-    statements
-    ;
+program : declaration_list  { printf("Parsing completed !\n"); }
+        |
+declaration_list : declaration
+                 | declaration_list declaration
+                 |class_declaration
 
-statements:
-    statement
-    | statements statement
-    ;
 
-statement:
-    IF
-    | THEN
-    | ELSE
-    | LET
-    | IN
-    | CASE
-    | OF
-    | WHERE
-    | DO
-    | INTEGER
-    | IDENTIFIER
-    | PLUS
-    | MINUS
-    | MULTIPLY
-    | DIVIDE
-    | EQUALS
-    | NOT_EQUALS
-    | LESS_THAN
-    | LESS_THAN_OR_EQUAL
-    | GREATER_THAN
-    | GREATER_THAN_OR_EQUAL
-    | AND
-    | OR
-    | NOT
-    | LPAREN
-    | RPAREN
-    | LBRACE
-    | RBRACE
-    | LBRACKET
-    | RBRACKET
-    | SEMICOLON
-    | COMMA
-    | COLON
-    | TYPE_SEPARATOR
-    | ASSIGN
-    | ARROW
-    | PIPE
-    | WILDCARD
-    | COMMENT
-    | UNKNOWN
-    ;
+declaration : class_declaration
+
+class_declaration : CLASS identifier identifier WHERE 
+
+
+
+type_specifier : INT
+               | CHAR
+               | BOOL
+               | VOID
+               | FLOAT
+               | STRING
+expression : EQUALS 
 
 %%
-void yyerror(const char *s);
+
+int main(int argc, char *argv[]) {
+    if (argc != 2) {
+        fprintf(stderr, "Usage: %s <input_file>\n", argv[0]);
+        return 1;
+    }
+
+    yyin = fopen(argv[1], "r");
+    if (!yyin) {
+        fprintf(stderr, "Error: could not open file %s\n", argv[1]);
+        return 1;
+    }
+
+    yyparse();
+    fclose(yyin);
+    return 0;
+}
+
+int yyerror(char *s) {
+    fprintf(stderr, "Error: %s at line %d\n", s,yylineno);
+    return 0;
+}

@@ -1,102 +1,126 @@
 %{
-#include <stdio.h>
-#include <stdlib.h>
 #include "parser.tab.h"
-extern int yyparse();
-extern int yylex(); // Declare the lexer function
-extern FILE* yyin; // Declare the input file pointer
+#include <string.h>
+int line_number = 1;
+
+struct symbol_entry {
+    char name[50];
+    char data_type[20];
+    int token_type;
+    // Add more attributes as needed
+};
+
+// Symbol table declaration
+struct symbol_entry symbol_table[100];
+int symbol_count = 0; // Counter to track the number of entries in symbol table
+
+// Function to search for an identifier in the symbol table
+char* token_strings[] = {
+    "identifier", "STRING_CONST", "FLOAT_CONST", "INT_CONST", "CHAR_CONST", 
+     "IMPORT", "BREAK", "MAP", "DO", "IF", "ELSE", "SEMICOLON", "COMMA",
+    "ASSIGN", "MINUS", "PLUS", "MULTIPLY", "DIVIDE", "MODULO", "DOT", "LEFTBRACKET", "RIGHTBRACKET",
+    "LEFTPAREN", "RIGHTPAREN", "LEFTBRACE", "RIGHTBRACE", "LESS_THAN", "LESS_EQUAL", "GREATER_THAN", "GREATER_EQUAL",
+    "EQUALS", "NOT_EQUALS", "AND", "OR", "NOT", "INT", "FLOAT", "VOID", "STRING","PUTSTRLN","LET","ARROW","CLASS"
+    "WHERE", "DOUBLE_COLON","MAIN","NEWLINE","BOOL","INSTANCE"
+};
+
+int search_symbol_table(char *name) {
+    for (int i = 0; i < symbol_count; i++) {
+        if (strcmp(symbol_table[i].name, name) == 0)
+            return symbol_table[i].token_type; // Return token if found
+    }
+    return -1; // Return -1 if not found
+}
+
+// Function to add an entry to the symbol table
+void add_to_symbol_table(char *name, int token) {
+    strcpy(symbol_table[symbol_count].name, name);
+    symbol_table[symbol_count].token_type = token;
+
+    symbol_count++;
+}
+
+void displaySymbolTable() {
+    printf("Symbol Table:\n");
+    printf("------------------------------------------------\n");
+    printf("%-20s | %-15s | %-10s\n", "Name", "Data Type", "Token Type");
+    printf("--------------\n");
+    for (int i = 0; i < symbol_count; i++) {
+        printf("%-20s | %-15s | %-10d\n", symbol_table[i].name, symbol_table[i].data_type, symbol_table[i].token_type);
+    }
+    printf("------------------------------------------------\n");
+}
+
 %}
 
+%option yylineno
+
 %%
+"import"                { return IMPORT; }
+ "main"                  {return MAIN;}
+ "IO"                    {return IO;}
+ "class"                 {return CLASS;}
+ "where"                 {return WHERE;}
+"break"                 { return BREAK; }
+"do"                    { return DO; }
+"if"                    { return IF; }
+"else"                  { return ELSE; }
+"putStrLn"               { return PUTSTRLN; }
+"instance"               {return INSTANCE;}
+";"                     { return SEMICOLON; }
+","                     { return COMMA; }
+"="                     { return ASSIGN; }
+"-"                     { return MINUS; }
+"+"                     { return PLUS; }
+"*"                     { return MULTIPLY; }
+"/"                     { return DIVIDE; }
+"mod"                     { return MODULO; }
+"::"                    {return DOUBLE_COLON;}
+"."                     { return DOT; }
+"["                     { return LEFTBRACKET; }
+"]"                     { return RIGHTBRACKET; }
+"("                     { return LEFTPAREN; }
+")"                     { return RIGHTPAREN; }
+"{"                     { return LEFTBRACE; }
+"}"                     { return RIGHTBRACE; }
+"<"                     { return LESS_THAN; }
+"<="                    { return LESS_EQUAL; }
+">"                     { return GREATER_THAN; }
+">="                    { return GREATER_EQUAL; }
+"=="                    { return EQUALS; }
+"!="                    { return NOT_EQUALS; }
+"&&"                    { return AND; }
+"||"                    { return OR; }
+"->"                    {return ARROW;}
+"!"                     { return NOT; }
+"Integer"                   { strcpy(symbol_table[symbol_count].data_type, "int"); return INT; }
+"Bool"                  {strcpy(symbol_table[symbol_count].data_type, "bool"); return BOOL; }
+"float"                 { strcpy(symbol_table[symbol_count].data_type, "float"); return FLOAT; }
+"void"                  { strcpy(symbol_table[symbol_count].data_type, "void"); return VOID; }
+"String"                { strcpy(symbol_table[symbol_count].data_type, "String"); return STRING; }
+"let"                   {strcpy(symbol_table[symbol_count].data_type, "let"); return LET;}
+[a-zA-Z_][a-zA-Z0-9_]*  {
+    yylval.strval = strdup(yytext);
+    int index = search_symbol_table(yytext);
+    if (index == -1) {
+        add_to_symbol_table(yytext, identifier);
+        return identifier; // Return IDENTIFIER token
+    } else {
+        return identifier; // Return type of the identifier
+    }
+}
 
-
-[ \t\n]+                        /* Ignore whitespace */
-
-"if"                            { yylval = IF; return IDENTIFIER; }
-"then"                          { yylval = THEN; return IDENTIFIER; }
-"else"                          { yylval = ELSE; return IDENTIFIER; }
-"let"                           { yylval = LET; return IDENTIFIER; }
-"in"                            { yylval = IN; return IDENTIFIER; }
-"case"                          { yylval = CASE; return IDENTIFIER; }
-"of"                            { yylval = OF; return IDENTIFIER; }
-"where"                         { yylval = WHERE; return IDENTIFIER; }
-"do"                            { yylval = DO; return IDENTIFIER; }
-
-[0-9]+                          { yylval = atoi(yytext); return INTEGER; }
-[a-zA-Z_][a-zA-Z0-9_']*         { yylval = strdup(yytext); return IDENTIFIER; }
-"+"                             { return PLUS; }
-"-"                             { return MINUS; }
-"*"                             { return MULTIPLY; }
-"/"                             { return DIVIDE; }
-"=="                            { return EQUALS; }
-"!="                            { return NOT_EQUALS; }
-"<"                             { return LESS_THAN; }
-"<="                            { return LESS_THAN_OR_EQUAL; }
-">"                             { return GREATER_THAN; }
-">="                            { return GREATER_THAN_OR_EQUAL; }
-"&&"                            { return AND; }
-"||"                            { return OR; }
-"not"                           { return NOT; }
-
-"("                             { return LPAREN; }
-")"                             { return RPAREN; }
-"{"                             { return LBRACE; }
-"}"                             { return RBRACE; }
-"["                             { return LBRACKET; }
-"]"                             { return RBRACKET; }
-";"                             { return SEMICOLON; }
-","                             { return COMMA; }
-":"                             { return COLON; }
-"::"                            { return TYPE_SEPARATOR; }
-"="                             { return ASSIGN; }
-"->"                            { return ARROW; }
-"|"                             { return PIPE; }
-"_"                             { return WILDCARD; }
-
-.                               { return UNKNOWN; }
+[0-9]+\.[0-9]+          { yylval.floatval = atof(yytext); return FLOAT_CONST; }
+[0-9]+                  { yylval.intval = atoi(yytext); return INT_CONST; }
+\"[^"]*\"               { yylval.strval = strdup(yytext); return STRING_CONST; }
+'.'                     { yylval.charval = yytext[1]; return CHAR_CONST; }
+\n          {}
+\s          {}
+\"[a-zA-Z]?\"(\\.|[^\\"])*\"        {  return STRING_LITERAL; }
 
 %%
 
 int yywrap() {
-    return 1;
-}
-
-
-int main(int argc, char *argv[]) {
-    if (argc != 2) {
-        fprintf(stderr, "Usage: %s <input_file>\n", argv[0]);
-        exit(EXIT_FAILURE);
-    }
-
-    // Open the input file
-    yyin = fopen(argv[1], "r");
-    if (yyin == NULL) {
-        fprintf(stderr, "Error: Unable to open input file %s\n", argv[1]);
-        exit(EXIT_FAILURE);
-    }
-
-    // Call the lexer
-    yylex();
-
-    // Close the input file
-    fclose(yyin);
-
-    // Reopen the input file for the parser
-    yyin = fopen(argv[1], "r");
-    if (yyin == NULL) {
-        fprintf(stderr, "Error: Unable to open input file %s\n", argv[1]);
-        exit(EXIT_FAILURE);
-    }
-
-    // Call the parser
-    yyparse();
-
-    // Close the input file
-    fclose(yyin);
-
-    return 0;
-}
-
-void yyerror(const char *s) {
-    fprintf(stderr, "%s\n", s);
+    displaySymbolTable(); // Call displaySymbolTable at the end of processing
+    return 1; // Indicate that there are no more input files to process
 }
