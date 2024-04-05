@@ -7,21 +7,19 @@ struct symbol_entry {
     char name[50];
     char data_type[20];
     int token_type;
-    // Add more attributes as needed
 };
 
-// Symbol table declaration
-struct symbol_entry symbol_table[100];
-int symbol_count = 0; // Counter to track the number of entries in symbol table
 
-// Function to search for an identifier in the symbol table
+struct symbol_entry symbol_table[500];
+int symbol_count = 0;
+
 char* token_strings[] = {
     "identifier", "STRING_CONST", "FLOAT_CONST", "INT_CONST", "CHAR_CONST", 
      "IMPORT", "BREAK", "MAP", "DO", "IF", "ELSE", "SEMICOLON", "COMMA",
     "ASSIGN", "MINUS", "PLUS", "MULTIPLY", "DIVIDE", "MODULO", "DOT", "LEFTBRACKET", "RIGHTBRACKET",
     "LEFTPAREN", "RIGHTPAREN", "LEFTBRACE", "RIGHTBRACE", "LESS_THAN", "LESS_EQUAL", "GREATER_THAN", "GREATER_EQUAL",
     "EQUALS", "NOT_EQUALS", "AND", "OR", "NOT", "INT", "FLOAT", "VOID", "STRING","PUTSTRLN","LET","ARROW","CLASS"
-    "WHERE", "DOUBLE_COLON","MAIN","NEWLINE","BOOL","INSTANCE"
+    "WHERE", "DOUBLE_COLON","MAIN","NEWLINE","BOOL","INSTANCE","DATA","DOLAR","THEN"
 };
 
 int search_symbol_table(char *name) {
@@ -57,7 +55,10 @@ void displaySymbolTable() {
 
 %%
 "import"                { return IMPORT; }
+"$"                      {return DOLAR;}
+"data"                  {return DATA;}
  "main"                  {return MAIN;}
+ "then"                  {return THEN;}
  "IO"                    {return IO;}
  "class"                 {return CLASS;}
  "where"                 {return WHERE;}
@@ -67,7 +68,6 @@ void displaySymbolTable() {
 "else"                  { return ELSE; }
 "putStrLn"               { return PUTSTRLN; }
 "instance"               {return INSTANCE;}
-";"                     { return SEMICOLON; }
 ","                     { return COMMA; }
 "="                     { return ASSIGN; }
 "-"                     { return MINUS; }
@@ -81,8 +81,6 @@ void displaySymbolTable() {
 "]"                     { return RIGHTBRACKET; }
 "("                     { return LEFTPAREN; }
 ")"                     { return RIGHTPAREN; }
-"{"                     { return LEFTBRACE; }
-"}"                     { return RIGHTBRACE; }
 "<"                     { return LESS_THAN; }
 "<="                    { return LESS_EQUAL; }
 ">"                     { return GREATER_THAN; }
@@ -95,14 +93,14 @@ void displaySymbolTable() {
 "!"                     { return NOT; }
 "Integer"                   { strcpy(symbol_table[symbol_count].data_type, "int"); return INT; }
 "Bool"                  {strcpy(symbol_table[symbol_count].data_type, "bool"); return BOOL; }
-"float"                 { strcpy(symbol_table[symbol_count].data_type, "float"); return FLOAT; }
+"Float"                 { strcpy(symbol_table[symbol_count].data_type, "float"); return FLOAT; }
 "void"                  { strcpy(symbol_table[symbol_count].data_type, "void"); return VOID; }
 "String"                { strcpy(symbol_table[symbol_count].data_type, "String"); return STRING; }
 "let"                   {strcpy(symbol_table[symbol_count].data_type, "let"); return LET;}
 [a-zA-Z_][a-zA-Z0-9_]*  {
-    yylval.strval = strdup(yytext);
-    int index = search_symbol_table(yytext);
-    if (index == -1) {
+
+    int values = search_symbol_table(yytext);
+    if (values == -1) {
         add_to_symbol_table(yytext, identifier);
         return identifier; // Return IDENTIFIER token
     } else {
@@ -114,7 +112,7 @@ void displaySymbolTable() {
 [0-9]+                  { yylval.intval = atoi(yytext); return INT_CONST; }
 \"[^"]*\"               { yylval.strval = strdup(yytext); return STRING_CONST; }
 '.'                     { yylval.charval = yytext[1]; return CHAR_CONST; }
-\n          {}
+\n              {}
 \s          {}
 \"[a-zA-Z]?\"(\\.|[^\\"])*\"        {  return STRING_LITERAL; }
 

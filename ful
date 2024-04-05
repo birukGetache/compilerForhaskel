@@ -1,165 +1,44 @@
-%{
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+program      ::= expression
 
-extern int line_number;
-extern void displaySymbolTable();
-extern FILE *yyin;
+expression   ::= literal
+               | variable
+               | functionCall
+               | letExpression
+               | conditionalExpression
+               | lambdaExpression
+               | binaryOperation
+               | unaryOperation
 
-void yyerror(const char *s);
+literal      ::= integerLiteral | floatLiteral | stringLiteral | charLiteral
 
-          // Define YYSTYPE struct for semantic values
-typedef struct {
-    char* strval;
-    float floatval;
-    int intval;
-    char charval;
-} YYSTYPE;
+variable     ::= identifier
 
-#define YYSTYPE_IS_DECLARED
-%}
+functionCall ::= identifier '(' arguments ')'
 
-%union {
-    char* strval;
-    float floatval;
-    int intval;
-    char charval;
-    char* expression;
-}
+letExpression ::= 'let' bindings 'in' expression
 
-%token <strval> IDENTIFIER STRING_CONST
-%token <floatval> FLOAT_CONST
-%token <intval> INT_CONST
-%token <charval> CHAR_CONST
+conditionalExpression ::= 'if' expression 'then' expression 'else' expression
 
-%token   PUTSTRLN IMPORT BREAK STRING_LITERAL DO IF ELSE 
-%token  SEMICOLON COMMA PRINT ASSIGN MINUS NEWLINE PLUS MULTIPLY DIVIDE MODULO DOT RIGhTBRACKET LEFTBRACKET IO CASE OF
-%token  LESS_THAN LESS_EQUAL GREATER_THAN GREATER_EQUAL EQUALS NOT_EQUALS AND OR NOT    
-%token  LEFTBRACE RIGHTBRACE LEFTPAREN RIGHTPAREN CLASS 
-%token  INT FLOAT VOID STRING ANOTATIONSEPARATOR  MAIN ARROW DOUBLE_COLON
-%%
+lambdaExpression ::= '\' arguments '->' expression
 
-program : statement_list { printf("Parsing completed !\n");}
-        | /* empty */
-        ;
+binaryOperation ::= expression operator expression
 
-statement_list : statement
-               | statement_list statement
-               | function_decl
-               | class_declaration
-               | statement_list class_declaration
-               | class_declaration statement_list
-               ;
-statement : main_function ;
-          |out_put_statment
-          | type_specifier expression     
-          | declaration
-          | assignment SEMICOLON { printf("Assignment statement parsed.\n"); }
-          | selection_statement
-          | iteration_statement
-          | out_put_statment
-          | increament_decreament SEMICOLON
-          | system_out_println SEMICOLON
-          ;
+unaryOperation ::= operator expression
 
- main_function: MAIN_FUNCTION;
+bindings     ::= binding (',' binding)*
 
- MAIN_FUNCTION : 'main' DOUBLE_COLON 'IO' LEFTPAREN RIGHTPAREN  func_body  ;
- func_body : statement_list
-          | /* empty */
-          ;
- IO_STATEMENT_LIST : IO_STATEMENT
-                  | IO_STATEMENT_LIST IO_STATEMENT ;
-IO_STATEMENT : 'putStrLn' STRING_LITERAL SEMICOLON ;
-out_put_statment : PUTSTRLN  STRING_CONST
-                 | PUTSTRLN  STRING_CONST  
-                 | PUTSTRLN  LEFTPAREN function_call RIGHTPAREN
-                 | PUTSTRLN  LEFTPAREN function_call RIGHTPAREN
-                 |PUTSTRLN   LEFTPAREN STRING_CONST PLUS PLUS function_call RIGHTPARENPAREN 
-                 | PUTSTRLN  LEFTPAREN function_call PLUS PLUS STRING_CONST RIGHTPAREN 
-                 ;
-void yyerror(const char *s) {
-    if (strcmp(s, "syntax error") == 0) {
-        fprintf(stderr, "Syntax error at line %d: %s\n", line_number, s);
-    } else {
-        fprintf(stderr, "Error: %s\n", s);
-    }
-    displaySymbolTable(); // Print the symbol table
-    exit(EXIT_FAILURE);
-}
+binding      ::= identifier '=' expression
 
+arguments    ::= identifier (',' identifier)*
 
+operator     ::= '+' | '-' | '*' | '/' | '=' | '==' | '<' | '>' | '&&' | '||' | ...
 
-int main(int argc, char *argv[]) {
-    if (argc < 2) {
-        printf("Usage: %s <input_file>\n", argv[0]);
-        return 1;
-    }
+identifier   ::= letter (letter | digit | '_')*
 
-    FILE *input_file = fopen(argv[1], "r");
-    if (!input_file) {
-        printf("Error opening input file.\n");
-        return 1;
-    }
+integerLiteral ::= digit+
 
-    // Define yyin and assign it the input file pointer
-    yyin = input_file;
+floatLiteral ::= digit+ '.' digit+
 
-    if (yyparse() == 0) {
-        printf("Your input Dart code is correct\n");
-                displaySymbolTable();
+stringLiteral ::= '"' characters '"'
 
-    }
-
-    fclose(input_file);
-
-    return 0;
-}
-
-
-
-
-
-
-function_definition : identifier DOUBLE_COLON params ARROW params func_body
- func_body: statement_list
-          |expression 
-
- identifiers :identifier ARROW identifiers
-             |identifier
-statement_list : statement
-               | statement_list statement
-               |identifier expression
-               ;
-statement : expression ';'    { /* Execute expression */ }
-          |out_statement
-          | declaration      { /* Execute declaration */ }
-          | if_statement     { /* Execute if statement */ }
-          | return_statement { /* Execute return statement */ }
-          ;
-out_statement: PUTSTRLN STRING_LITERAL
-expression : primary_expression
-           |identifier identifier EQUAL STRING_LITERAL
-           |identifier expression
-           | expression '+' expression   { /* Addition */ }
-           | expression '-' expression   { /* Subtraction */ }
-           | expression '*' expression   { /* Multiplication */ }
-           | expression '/' expression   { /* Division */ }
-           | '-' expression %prec UMINUS { /* Unary minus */ }
-           | '(' expression ')'         { /* Parenthesized expression */ }
-           |EQUALS
-           ;
-instance_declaration : identifier EQUALS INT_CONST COMMA INT_CONST
-
-params : type_specifier ARROW params
-       | type_specifier
-       | 
-       ;
-
-type_specifier : INT
-               | CHAR
-               | BOOL
-               | VOID
-               | FLOAT
-               | STRING
+charLiteral ::= '\'' character '\''

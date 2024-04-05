@@ -68,29 +68,32 @@
      MAIN = 284,
      LEFTBRACE = 285,
      RIGHTBRACE = 286,
-     LESS_THAN = 287,
-     LESS_EQUAL = 288,
-     GREATER_THAN = 289,
-     GREATER_EQUAL = 290,
-     EQUALS = 291,
-     NOT_EQUALS = 292,
-     AND = 293,
-     OR = 294,
-     NOT = 295,
-     BOOL = 296,
-     CHAR = 297,
-     INT = 298,
-     FLOAT = 299,
-     VOID = 300,
-     STRING = 301,
-     LET = 302,
-     ARROW = 303,
-     CLASS = 304,
-     WHERE = 305,
-     DOUBLE_COLON = 306,
-     LEFTPAREN = 307,
-     RIGHTPAREN = 308,
-     INSTANCE = 309
+     DOLAR = 287,
+     THEN = 288,
+     LESS_THAN = 289,
+     LESS_EQUAL = 290,
+     GREATER_THAN = 291,
+     GREATER_EQUAL = 292,
+     EQUALS = 293,
+     NOT_EQUALS = 294,
+     AND = 295,
+     OR = 296,
+     NOT = 297,
+     BOOL = 298,
+     CHAR = 299,
+     INT = 300,
+     FLOAT = 301,
+     VOID = 302,
+     STRING = 303,
+     LET = 304,
+     ARROW = 305,
+     CLASS = 306,
+     WHERE = 307,
+     DOUBLE_COLON = 308,
+     LEFTPAREN = 309,
+     RIGHTPAREN = 310,
+     INSTANCE = 311,
+     DATA = 312
    };
 #endif
 
@@ -101,7 +104,7 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 23 "parser.y"
+#line 22 "parser.y"
 
     char* strval;
     float floatval;
@@ -112,7 +115,7 @@ typedef union YYSTYPE
 
 
 /* Line 1676 of yacc.c  */
-#line 116 "parser.tab.h"
+#line 119 "parser.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
