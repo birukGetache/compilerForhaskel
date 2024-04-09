@@ -16,6 +16,8 @@ typedef struct {
     char charval;
 } YYSTYPE;
 
+extern char encountered_tokens[500][50];
+
 #define YYSTYPE_IS_DECLARED
 %}
 
@@ -32,14 +34,29 @@ typedef struct {
 %token <intval> INT_CONST
 %token <charval> CHAR_CONST
 
-%token PUTSTRLN IMPORT BREAK STRING_LITERAL DO IF ELSE SEMICOLON COMMA ASSIGN MINUS PLUS MULTIPLY DIVIDE MODULO DOT RIGHTBRACKET LEFTBRACKET IO CASE OF MAIN LEFTBRACE RIGHTBRACE DOLAR THEN
-%token LESS_THAN LESS_EQUAL GREATER_THAN GREATER_EQUAL EQUALS NOT_EQUALS AND OR NOT BOOL CHAR INT FLOAT VOID STRING LET ARROW CLASS WHERE DOUBLE_COLON LEFTPAREN RIGHTPAREN INSTANCE DATA
+%token PUTSTRLN IMPORT BREAK STRING_LITERAL DO IF ELSE SEMICOLON COMMA ASSIGN MINUS PLUS MULTIPLY DIVIDE MODULO DOT RIGHTBRACKET LEFTBRACKET IO CASE OF MAIN LEFTBRACE RIGHTBRACE DOLAR THEN SHOW
+%token LESS_THAN LESS_EQUAL GREATER_THAN GREATER_EQUAL EQUALS NOT_EQUALS AND OR NOT BOOL CHAR INT FLOAT VOID STRING LET ARROW CLASS WHERE DOUBLE_COLON LEFTPAREN RIGHTPAREN INSTANCE DATA BAR
 
 %%
 
 program : declaration_list  { printf("Parsing completed !\n"); }
         | function_declaration
+        |main_method
 declaration_list :class_declaration
+
+function_declaration : identifier DOUBLE_COLON 
+
+mainMethod : MAIN 
+
+typeForProgram: type_specifier ARROW typeForProgram 
+              |type_specifier
+              |
+
+func_statement :identifiers 
+
+identifiers: identifier identifiers 
+           | identifier 
+           |
 
 class_declaration : CLASS identifier identifier WHERE func_add
 
@@ -58,11 +75,12 @@ argsforClass: identifier
             |identifier argsforClass
             |
 
-expression : expression MULTIPLY expression
+expression : expression MULTIPLY expression statements
            |identifier DIVIDE identifier
            |identifier PLUS identifier
            |identifier PLUS PLUS identifier
            |identifier  MINUS identifier
+           |identifier GREATER_THAN INT_CONST
            |MINUS identifier
            |LEFTPAREN  expression RIGHTPAREN
            |NOT expression
@@ -75,6 +93,8 @@ expression : expression MULTIPLY expression
            |STRING_LITERAL PLUS PLUS identifier LEFTPAREN args RIGHTPAREN
            |ASSIGN
            |AND
+           |identifier ASSIGN consts
+           |
 
 args: identifier identifier
     |identifier
@@ -83,10 +103,23 @@ args: identifier identifier
  main_method : MAIN DOUBLE_COLON IO LEFTPAREN RIGHTPAREN maindo
 
  maindo: MAIN ASSIGN DO statements 
+       |MAIN ASSIGN DO statements  function_declaration
 
   statements:  type_specifier identifier expression identifier consts  statements
-               |output_statement
+               |type_specifier expression statements
+               |output_statement statements
+               |type_specifier expression statements
+               |if_statement  statements
+               |expression
+               |elseIF_statement
+               |type_specifier identifier ASSIGN STRING_CONST PLUS INT_CONST
+               | type_specifier identifier  ASSIGN INT_CONST statements
                |
+elseIF_statement:ELSE IF expression THEN statements  
+                |ELSE IF expression THEN statements elseIF_statement 
+if_statement : IF expression THEN statements 
+             |
+else_statement:  ELSE statements
 consts: INT_CONST consts
       |INT_CONST
       |FLOAT consts
@@ -94,9 +127,16 @@ consts: INT_CONST consts
       |BOOL consts
       |BOOL
       |STRING consts
-      |STRING
+      |STRING_CONST
 
- output_statement:PUTSTRLN DOLAR expression
+ output_statement:PUTSTRLN DOLAR expression 
+                |PUTSTRLN DOLAR STRING_CONST PLUS PLUS show_statement 
+                |PUTSTRLN DOLAR STRING_CONST SHOW LEFTPAREN identifiers RIGHTPAREN
+show_statement:SHOW identifier PLUS PLUS  SHOW identifier 
+              |PUTSTRLN DOLAR STRING_CONST PLUS PLUS SHOW LEFTPAREN identifiers RIGHTPAREN
+              |SHOW LEFTPAREN identifiers RIGHTBRACE
+              |SHOW LEFTPAREN identifiers RIGHTPAREN
+
 types : type_specifier
       | type_specifier type_specifier
   function_declaration: identifier DOUBLE_COLON type_specifier ARROW type_specifier function_definition_method
@@ -128,8 +168,20 @@ int main(int argc, char *argv[]) {
 
     yyparse();
     fclose(yyin);
+
+    // Display encountered tokens
+    printf("Encountered Tokens:\n");
+    for (int i = 0; i < 500; i++) {
+        if (encountered_tokens[i][0] != '\0') {
+            printf("%s\n", encountered_tokens[i]);
+        } else {
+            break; // Stop when encountering an empty token
+        }
+    }
+
     return 0;
 }
+
 
 int yyerror(char *s) {
     fprintf(stderr, "Error: %s at line %d\n", s,yylineno);
