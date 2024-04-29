@@ -3,12 +3,15 @@ area :: a -> Integer
 data Rectangle = Rectangle Float Float
 instance ShapeClass Rectangle where
 area (Circle radius) = pi * radius * radius
-  let hellow = 65
+  ayle = "biurk"
 main :: IO ()
 main = do
     let rect = Rectangle 5 6
     putStrLn $ "Area of rectangle: " ++ show (area rect)
-    let hellow = 65
+      let biruk = 20
     let hellow = 65
   
+    let ayle = "biurk"
+    String ayle= "hena"
+    Integer 
     

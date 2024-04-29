@@ -44,7 +44,8 @@ program : declaration_list  { printf("Parsing completed !\n"); }
         |main_method
 declaration_list :class_declaration
 
-function_declaration : identifier DOUBLE_COLON 
+function_declaration : identifier DOUBLE_COLON typeForProgram body
+body: statements main_method                    
 
 mainMethod : MAIN 
 
@@ -103,18 +104,25 @@ args: identifier identifier
  main_method : MAIN DOUBLE_COLON IO LEFTPAREN RIGHTPAREN maindo
 
  maindo: MAIN ASSIGN DO statements 
-       |MAIN ASSIGN DO statements  function_declaration
+       |MAIN ASSIGN DO statements
+functiono: identifier 
 
   statements:  type_specifier identifier expression identifier consts  statements
                |type_specifier expression statements
                |output_statement statements
+               |identifier ASSIGN consts statements
                |type_specifier expression statements
                |if_statement  statements
                |expression
                |elseIF_statement
-               |type_specifier identifier ASSIGN STRING_CONST PLUS INT_CONST
+               |type_specifier identifier ASSIGN STRING_CONST PLUS INT_CONST statements
                | type_specifier identifier  ASSIGN INT_CONST statements
+               |type_specifier identifier ASSIGN identifier operation identifier
                |
+operation: PLUS
+        |MINUS
+        |MULTIPLY
+        |DIVIDE
 elseIF_statement:ELSE IF expression THEN statements  
                 |ELSE IF expression THEN statements elseIF_statement 
 if_statement : IF expression THEN statements 
